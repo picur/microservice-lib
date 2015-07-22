@@ -1,0 +1,13 @@
+parameters:
+
+services:
+  app.services.zmq:
+    class: Phppro\MicroService\Service\ZmqService
+  app.services.daemon:
+    class: Phppro\MicroService\Service\DaemonService
+    calls:
+      - [setZmqService, [@app.services.zmq]]
+  app.services.client:
+    class: Phppro\MicroService\Service\ClientService
+    calls:
+      - [setZmqService, [@app.services.zmq]]
