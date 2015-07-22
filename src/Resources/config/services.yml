@@ -1,6 +1,16 @@
 parameters:
+  app_application_class: Phppro\MicroService\Application
+  app_command: main
+  app_name: microservice
 
 services:
+  app.application:
+    class: %app_application_class%
+    arguments:
+      - %app_name%
+    calls:
+      - [setCommandName, [%app_command%]]
+      - [add, [@app.command]]
   app.services.zmq:
     class: Phppro\MicroService\Service\ZmqService
   app.services.daemon:

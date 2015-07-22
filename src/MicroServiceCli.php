@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 /**
  * @author Olivier Hoareau <olivier@phppro.fr>
  */
-class Cli
+class MicroServiceCli
 {
     /**
      * @var ContainerBuilder
@@ -36,22 +36,53 @@ class Cli
         return (new static())->run($applicationName);
     }
     /**
+     * @return $this
+     */
+    protected function loadCommonConfig()
+    {
+        $loader = new YamlFileLoader($this->containerBuilder, new FileLocator(__DIR__ . '/Resources/config'));
+        $loader->load('services.yml');
+
+        return $this;
+    }
+    /**
+     * @return $this
+     */
+    protected function loadConfig()
+    {
+        $configDir = $this->getConfigDir();
+        if (null !== $configDir) {
+            $loader = new YamlFileLoader($this->containerBuilder, new FileLocator($configDir));
+            $loader->load('config.yml');
+        }
+
+        return $this;
+    }
+    /**
+     * @return $this
+     */
+    protected function loadContainerBuilder()
+    {
+        $this->containerBuilder = new ContainerBuilder();
+        $this->loadCommonConfig();
+        $this->loadConfig();
+
+        return $this;
+    }
+    /**
+     * @return string
+     */
+    protected function getConfigDir()
+    {
+        return dirname((new \ReflectionClass($this))->getFileName());
+    }
+    /**
      * @return ContainerBuilder
      */
     public function getContainerBuilder()
     {
         if (null === $this->containerBuilder) {
-            $c = new ContainerBuilder();
-            $loader = new YamlFileLoader($c, new FileLocator(__DIR__ . '/..'));
-            $loader->load('config.yml.dist');
-            try {
-                $loader->load('config.yml');
-            } catch (\Exception $e) {
-                // no specific config.yml file to load
-            }
-            $loader = new YamlFileLoader($c, new FileLocator(__DIR__ . '/Resources/config'));
-            $loader->load('services.yml');
-            $this->containerBuilder = $c;
+            $this->loadContainerBuilder();
         }
 
         return $this->containerBuilder;

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 /**
  * @author Olivier Hoareau <olivier@phppro.fr>
  */
-abstract class Application extends BaseApplication
+class Application extends BaseApplication
 {
     /**
      * @var string
